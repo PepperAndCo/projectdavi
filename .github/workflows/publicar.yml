@@ -1,0 +1,35 @@
+
+name: Publicar HTML automaticamente
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "davi_acesso_restrito.html"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-html
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter HTML
+        uses: actions/checkout@v4
+
+      - name: Criar Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="auto-${GITHUB_SHA::12}"
+
+          gh release create "$TAG" \
+            "davi_acesso_restrito.html" \
+            --title "Atualizacao $TAG" \
+            --notes "Atualizacao automatica" \
+            --latest
